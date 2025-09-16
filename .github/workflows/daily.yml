@@ -1,0 +1,90 @@
+name: Daily Notes & Issues
+
+on:
+  schedule:
+    # Run at 01:00 UTC (08:00 WIB) every day
+    - cron: '0 1 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  daily-note:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Random delay (max 2 hours)
+        run: |
+          delay=$((RANDOM % 7200))
+          echo "Waiting for $delay seconds..."
+          sleep $delay
+
+      - name: Generate daily note
+        run: npm run daily
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Commit and push changes
+        run: |
+          git add notes/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            # Use a random commit message
+            commit_messages=(
+              "docs: add daily note"
+              "chore: update experiment log"
+              "feat: new daily entry"
+              "docs: daily workflow update"
+              "chore: automated note generation"
+              "feat: add daily experiment log"
+              "docs: update daily notes"
+              "chore: daily maintenance log"
+              "feat: workflow experiment entry"
+              "docs: automated daily update"
+            )
+            random_message=${commit_messages[$RANDOM % ${#commit_messages[@]}]}
+            git commit -m "$random_message"
+            git push
+          fi
+
+  create-weekly-issues:
+    runs-on: ubuntu-latest
+    # Run only on Tuesday and Friday
+    if: contains(fromJson('["2", "5"]'), github.event.schedule || '2')
+    steps:
+      - name: Create random issue
+        uses: peter-evans/create-issue@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: ${{ fromJson('["Idea: experiment caching strategy", "Research: workflow optimization techniques", "Todo: improve automation scripts", "Idea: enhance CI/CD pipeline", "Research: GitHub Actions best practices", "Todo: refactor workflow configurations", "Idea: implement advanced scheduling", "Research: workflow security improvements", "Todo: add monitoring capabilities", "Idea: experiment with matrix builds"]')[github.run_number % 10] }}
+          body: |
+            ## Description
+            This is an automated issue created as part of our GitHub Actions experimentation.
+            
+            ## Tasks
+            - [ ] Research implementation approach
+            - [ ] Create proof of concept
+            - [ ] Test and validate solution
+            - [ ] Document findings
+            
+            ## Notes
+            Generated automatically on ${{ github.event.schedule || 'manual trigger' }}
+            
+            ---
+            *This issue was created automatically by our experimental workflow*
+          labels: |
+            experiment
+            automation
+            enhancement

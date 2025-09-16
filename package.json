@@ -1,0 +1,15 @@
+{
+  "name": "github-actions-experiment",
+  "version": "1.0.0",
+  "description": "Experimenting with automated GitHub Actions workflows",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "daily": "node index.js",
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["github-actions", "automation", "experiment"],
+  "author": "",
+  "license": "MIT"
+}
