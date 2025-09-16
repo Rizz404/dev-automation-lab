@@ -67,7 +67,7 @@ jobs:
         uses: actions/peter-evans/create-issue-action@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: ${{ fromJson('["Idea: experiment caching strategy", "Research: workflow optimization techniques", "Todo: improve automation scripts", "Idea: enhance CI/CD pipeline", "Research: GitHub Actions best practices", "Todo: refactor workflow configurations", "Idea: implement advanced scheduling", "Research: workflow security improvements", "Todo: add monitoring capabilities", "Idea: experiment with matrix builds"]')[github.run_number % 10] }}
+          title: "${{ fromJson('[\"Idea: experiment caching strategy\", \"Research: workflow optimization techniques\", \"Todo: improve automation scripts\", \"Idea: enhance CI/CD pipeline\", \"Research: GitHub Actions best practices\", \"Todo: refactor workflow configurations\", \"Idea: implement advanced scheduling\", \"Research: workflow security improvements\", \"Todo: add monitoring capabilities\", \"Idea: experiment with matrix builds\"]')[github.run_number % 10] }}"
           body: |
             ## Description
             This is an automated issue created as part of our GitHub Actions experimentation.
