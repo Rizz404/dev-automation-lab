@@ -60,14 +60,32 @@ jobs:
 
   create-weekly-issues:
     runs-on: ubuntu-latest
-    # Run only on Tuesday (2) and Friday (5)
-    if: contains(fromJson('["2", "5"]'), format('{0}', github.event.schedule && '2' || github.run_number % 7))
+    # Run only on Tuesday (2) and Friday (5) - simplified to run on schedule
+    if: github.event_name == 'schedule'
     steps:
+      - name: Set issue title
+        id: issue_title
+        run: |
+          titles=(
+            "Idea: experiment caching strategy"
+            "Research: workflow optimization techniques" 
+            "Todo: improve automation scripts"
+            "Idea: enhance CI/CD pipeline"
+            "Research: GitHub Actions best practices"
+            "Todo: refactor workflow configurations"
+            "Idea: implement advanced scheduling"
+            "Research: workflow security improvements"
+            "Todo: add monitoring capabilities"
+            "Idea: experiment with matrix builds"
+          )
+          random_index=$((RANDOM % ${#titles[@]}))
+          echo "title=${titles[$random_index]}" >> $GITHUB_OUTPUT
+          
       - name: Create random issue
-        uses: actions/peter-evans/create-issue-action@v5
+        uses: peter-evans/create-issue-action@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: "${{ fromJson('[\"Idea: experiment caching strategy\", \"Research: workflow optimization techniques\", \"Todo: improve automation scripts\", \"Idea: enhance CI/CD pipeline\", \"Research: GitHub Actions best practices\", \"Todo: refactor workflow configurations\", \"Idea: implement advanced scheduling\", \"Research: workflow security improvements\", \"Todo: add monitoring capabilities\", \"Idea: experiment with matrix builds\"]')[github.run_number % 10] }}"
+          title: ${{ steps.issue_title.outputs.title }}
           body: |
             ## Description
             This is an automated issue created as part of our GitHub Actions experimentation.
