@@ -1,5 +1,4 @@
 name: Daily Notes & Issues
-
 on:
   schedule:
     # Run at 01:00 UTC (08:00 WIB) every day
@@ -12,29 +11,29 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+        
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-
+          
       - name: Install dependencies
         run: npm install
-
+        
       - name: Random delay (max 2 hours)
         run: |
           delay=$((RANDOM % 7200))
           echo "Waiting for $delay seconds..."
           sleep $delay
-
+          
       - name: Generate daily note
         run: npm run daily
-
+        
       - name: Configure Git
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-
+          
       - name: Commit and push changes
         run: |
           git add notes/
@@ -61,11 +60,11 @@ jobs:
 
   create-weekly-issues:
     runs-on: ubuntu-latest
-    # Run only on Tuesday and Friday
-    if: contains(fromJson('["2", "5"]'), github.event.schedule || '2')
+    # Run only on Tuesday (2) and Friday (5)
+    if: contains(fromJson('["2", "5"]'), format('{0}', github.event.schedule && '2' || github.run_number % 7))
     steps:
       - name: Create random issue
-        uses: peter-evans/create-issue@v5
+        uses: actions/peter-evans/create-issue-action@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: ${{ fromJson('["Idea: experiment caching strategy", "Research: workflow optimization techniques", "Todo: improve automation scripts", "Idea: enhance CI/CD pipeline", "Research: GitHub Actions best practices", "Todo: refactor workflow configurations", "Idea: implement advanced scheduling", "Research: workflow security improvements", "Todo: add monitoring capabilities", "Idea: experiment with matrix builds"]')[github.run_number % 10] }}
